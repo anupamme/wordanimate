@@ -1,6 +1,4 @@
 $(document).ready(function() {
   
-  $('#editor')
-    .lyvewrite();
-  
+  $('#editor').lyvewrite();
 });
