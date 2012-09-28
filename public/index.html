@@ -3,24 +3,31 @@
   <head>
     <title>LyveWrite</title>
 
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="lib/lyvewrite/lyvewrite.css" />
-    <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="test/qunit-git.css" />
-    
-  </head>
-
-  <body>
-    <div id="container" style="width:800px">
-      <div id="editor"></div>
-    </div>
-
-    <div id="qunit"></div>
 
     <script src="lib/jquery-1.8.1.js"></script>
     <script src="lib/angular/angular.min.js"></script>
     <script src="lib/lyvewrite/jquery.lyvewrite.js"></script>
     <script src="js/script.js"></script>
-	  
+
+  </head>
+
+  <body>
+    <div class="container">
+      
+      <div class="navbar">Home</div>
+      
+      <div id="editor"></div>
+
+      <button class="btn btn-success"> Save </button>
+      <button class="btn btn-danger"> Discard </button>
+      <button class="btn btn-primary pull-right"> Publish </button>
+
+    </div>
+
+    <div id="qunit"></div>	  
     <script src="test/qunit-git.js"></script>
     <script src="test/tests.js"></script>    
   </body>

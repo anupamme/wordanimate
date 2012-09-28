@@ -1,4 +1,7 @@
 $(document).ready(function() {
   
-  $('#editor').lyvewrite();
+  $('#editor').lyvewrite({
+    width: 930,
+    height: 300
+  });
 });
