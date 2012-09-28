@@ -29,19 +29,19 @@
   bold = function (e) {
     e.preventDefault();
     exec('bold');
-    $('#'+e.data.areaId).focus();
+    e.data.$textarea.focus();
   },
   
   italic = function (e) {
     e.preventDefault();
     exec('italic');
-    $('#'+e.data.areaId).focus();
+    e.data.$textarea.focus();
   },
   
   list = function (e) {
     e.preventDefault();
     exec('insertUnorderedList');
-    $('#'+e.data.areaId).focus();
+    e.data.$textarea.focus();
   },
 
   link = function (e) {
@@ -51,146 +51,189 @@
       var href = prompt('Enter a link:', 'http://');
       exec('createLink', href);
     } else { return; }
-    $('#'+e.data.areaId).focus();
+    e.data.$textarea.focus();
   },
   
-  h2 = function (e) {
+  large = function (e) {
     e.preventDefault();
     if (query('formatBlock') === 'h2') {
       exec('formatBlock', 'p');
     } else { exec('formatBlock', 'h2'); }
-    $('#'+e.data.areaId).focus();
+    e.data.$textarea.focus();
   },
   
-  h3 = function (e) {
+  medium = function (e) {
     e.preventDefault();
     if (query('formatBlock') === 'h3') {
       exec('formatBlock', 'p');
     } else { exec('formatBlock', 'h3'); }
-    $('#'+e.data.areaId).focus();
+    e.data.$textarea.focus();
   },
     
-  addMenu = function ($el, buttons, className, id) {
-    
-    var buttonsList = buttons.split(",");
-    var $menu = $("<div id=" + id + "/>").addClass(className);
+  //the functions below are coupled to the structure of the data object
+
+  buildMenu = function (data) {
+
+    var buttonNames = data.buttonNames,
+    buttons = data.buttons,
+    className = data.menuClassName,
+    menuId = data.menuId,
+    areaId = data.textareaId;
+
+    var addButton = function (name, $parent, buttons) {
+      var $button = $("<a href='#' " 
+		      + buttons[name].selector 
+		      + ">" 
+		      + buttons[name].html
+		      + "</a>");
+      $parent.append($button);
+      return $button;
+    };
+
+    var delegateEvents = function (name, $button, events) {
+
+      for (var e in events) {
+	$button.on(e, data, events[e]);
+      }
+    };
+
+    var $menu = $("<div id=" + menuId + "/>").addClass(className);
   
-    if (buttonsList instanceof Array) {
-      buttonsList.forEach(function (name, idx, array) {
-        var button = "<a href='#' data-type=" + name + ">" + name + "</a>";
-        $menu.append(button);
+    if (buttonNames instanceof Array) {
+      buttonNames.forEach(function (name, idx, array) {
+	var $button = addButton(name, $menu, buttons);
+	delegateEvents(name, $button, buttons[name].events);
       }, null);
     } else {
       $.error('incorrect argument passed to function addMenu');
     }
-    
-    return $el.prepend($menu);
+
+    return $menu;
   },
 
-  addTextarea = function ($el, className, id, width, height) {
+  buildTextarea = function (data) {
+    
+    var className = data.textareaClassName,
+    id = data.textareaId,
+    width = data.width,
+    height = data.height;
+
     var $textarea = $("<div id="+ id + "/>")
-      .attr('contenteditable', true)
+      .attr('contentEditable', true)
       .addClass(className)
       .css({
 	'width': width,
 	'height': height
       });
-
-    return $el.append($textarea);
-  },
-  
-  delegateEvents = function ($el, eventsMap, areaId, menuId) {
-
-    for (var selector in eventsMap) {
-
-      var eventMapList = eventsMap[selector];
-      eventMapList.forEach(function (eventMap, idx, array) {
-
-	for (var event in eventMap) {
-
-	  var handlers = eventMap[event];
-	  handlers.forEach(function (handler, idx, array) {
-	    $el.on(event,
-		   selector, 
-		   {
-		     'areaId': areaId,
-		     'menuId': menuId
-		   },
-		   handler);
-	  }, null);
-
-	}
-      }, null);
-
-    }
-  },
-
-  buildEditor = function ($el, options) {
     
-    options = $.extend(data, options || {});
-    
-    addMenu($el, 
-	    options.buttons,
-	    options.menuClassName,
-	    options.menuId);
-
-    addTextarea($el,
-		options.areaClassName,
-		options.areaId,
-		options.width,
-		options.height);
-
-    delegateEvents($el, 
-		   options.eventsMap,
-		   options.areaId,
-		   options.menuId);
-
-    return true;
-  },
+    return $textarea;
+  },  
   
   data = {
+
+    $el: null,
+    $menu: null,
+    $textarea: null,
     
     width: 400,
     height: 400,
-    
-    buttons: "bold,italic,list,link,large,medium",
-    
-    areaClassName: 'area',
-    
-    areaId: 'lwtextarea',
+        
+    textareaClassName: 'area',
+    textareaId: 'lwtextarea',
 
     menuClassName: 'lyvewrite',
-
     menuId: 'lwmenu',
 
-    eventsMap: {
-      '[data-type=bold]'  : [ {'click': [bold]} ],
-      '[data-type=italic]': [ {'click': [italic]} ],
-      '[data-type=list]'  : [ {'click': [list]} ],
-      '[data-type=link]'  : [ {'click': [link]} ],
-      '[data-type=large]' : [ {'click': [h2]} ],
-      '[data-type=medium]': [ {'click': [h3]}  ],
+    buttonNames: ['bold', 'italic', 'list', 'link', 'large', 'medium'], 
+    buttons: {
+
+      'bold': {
+	html: 'bold',
+	selector: '[button-type=bold]',
+	events: { 'click': bold }
+      },
+      'italic':{
+	html: 'italic',
+	selector: '[button-type=italic]',
+	events: { 'click': italic }
+      },
+      'list': {
+	html: 'list',
+	selector: '[button-type=list]',
+	events: { 'click': list }
+      },
+      'link': {
+	html: 'link',
+	selector: '[button-type=link]',
+	events: { 'click': link }
+      },
+      'large': {
+	html: 'large',
+	selector: '[button-type=large]',
+	events: { 'click': large }
+      },
+      'medium': {
+	html: 'medium',
+	selector: '[button-type=medium]',
+	events: { 'click': medium }
+      }
     }
-    
   },
 
+  //The functions below mutate the data object
 
-  createButton = function (name, action) {
-    //createButton is the only function which mutates state (the data object)
-    data.buttons += "," + name;
-    var selector = "[data-type=" + name + "]";
-    data.eventsMap[selector] = [ {'click': [action]} ];
+  createEditor = function ($el, data) {
+    data.$el = $el;
+    data.$menu = buildMenu(data); 
+    data.$textarea = buildTextarea(data);
+
+    $el.prepend(data.$menu);
+    $el.append(data.$textarea);
+    return $el;
+  },
+
+  rebuildMenu = function (data) {
+    data.$menu.remove();
+    data.$menu = buildMenu(data);
+    data.$el.prepend(data.$menu);
+    return true;
+  },
+
+  addButton = function (name, button, index) {
+    var idx = index || data.buttonNames.length;
+    data.buttonNames.splice(idx, 0, name);
+    data.buttons[name] = button;
+  },
+
+  removeButton = function (name) {
+    var idx = data.buttonNames.indexOf(name);
+    data.buttonNames.splice(idx, 1);
+    delete data.buttons[name];
+  },
+
+  replaceButton = function (oldName, newName, newButton) {
+    var idx = data.buttonNames.indexOf(oldName);
+    removeButton(oldName);
+    addButton(newName, newButton, idx);
   };
 
-  $.lyvewrite = {
-    'createButton': createButton
-  };
-  
   $.fn.lyvewrite = function (options) {
+
+    data = $.extend(data, options || {});
     
     return this.each(function (idx, el) {
-      buildEditor($el, options, createButton);		     
+      createEditor($(el), data);
     });
+  };
+
+  //Exports for global access by plugins
+
+  $.lyvewrite = {
+    'data': data,
+    'rebuildMenu': rebuildMenu,
+    'addButton': addButton,
+    'removeButton': removeButton,
+    'replaceButton': replaceButton
   };
   
 }(jQuery, window, document));
