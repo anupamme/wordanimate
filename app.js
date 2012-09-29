@@ -1,14 +1,18 @@
 
-/**
- * Module dependencies.
- */
-
-var express = require('express')
-  , routes = require('./routes')
-  , http = require('http')
-  , path = require('path');
+var express = require('express'),
+routes = require('./routes'),
+http = require('http'),
+path = require('path'),
+mongoose = require('mongoose');
 
 var app = express();
+
+var Post = mongoose.model('Post', new Schema({
+  title: String,
+  content: String
+}));
+
+mongoose.connect('mongodb://localhost/activewrite');
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -26,8 +30,15 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.sendfile('public/index.html');
+});
+
+app.get('/api/posts', function (req, res) {
+  
+});
+
+app.post('/api/posts', function (req, res) {
 });
 
 http.createServer(app).listen(app.get('port'), function(){

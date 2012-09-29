@@ -1,7 +1,7 @@
 $(document).ready(function() {
   
   $('#editor').lyvewrite({
-    width: 930,
+    width: 600,
     height: 300
   });
 });
