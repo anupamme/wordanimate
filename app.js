@@ -7,12 +7,12 @@ mongoose = require('mongoose');
 
 var app = express();
 
-var Post = mongoose.model('Post', new Schema({
+var Post = mongoose.model('Post', new mongoose.Schema({
   title: String,
   content: String
 }));
 
-mongoose.connect('mongodb://localhost/activewrite');
+mongoose.connect('mongodb://localhost/wordanimate');
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
