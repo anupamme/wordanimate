@@ -1,10 +1,7 @@
 $(document).ready(function () {
   
   var Post = Backbone.Model.extend({
-    defaults: {
-      title: "Post title",
-      content: "some words"
-    }
+    idAttribute: '_id'
   });
 
   var Blog = Backbone.Collection.extend({
@@ -36,37 +33,86 @@ $(document).ready(function () {
     },
 
     savePost: function () {
-      console.log(this.model.url());
       var title = $('#title').val();
       var content = $('#editor').wordframe('getContents');
       this.model.save({
 	'title': title, 
 	'content': content
       });
-      if (this.model.isNew()) {
-	this.model.id = this.collection.length + 1;
-      }
     }
   });
 
-  var PostView = Backbone.View.extend({});
+  var PostView = Backbone.View.extend({
 
-  var BlogView = Backbone.View.extend({});
+    tagName: 'li',
+
+    template: _.template($('#posttemplate').html()),
+
+    initialize: function () {
+      _.bindAll(this);
+    },
+
+    render: function () {
+      $(this.el).html(this.template({
+	title: this.model.get('title'),
+	content: this.model.get('content')
+      }));
+      return this;
+    }
+  });
+
+  var BlogView = Backbone.View.extend({
+
+    template: _.template($('#blogtemplate').html()),
+    
+    initialize: function () {
+      _.bindAll(this);
+      this.render();
+    },
+
+    render: function () {
+      var self = this;
+      $(this.el).append(this.template());
+      _.each(this.collection.models, function (post, idx, list) {
+	var postView = new PostView({ model: post});
+	$(self.el).append(postView.render().el);
+      }, this);
+    }
+  });
 
   var WordAnimateView = Backbone.View.extend({
     el: $('.container'),
     
     template: _.template($('#wordanimatetemplate').html()),
+
+    events: {
+      'click a#view': 'renderBlogView',
+      'click a#compose': 'renderWriteView'
+    },
     
     initialize: function () {
       _.bindAll(this);
       this.collection = new Blog();
       this.collection.fetch();
-      this.render();
+      this.collection.on('reset', this.renderBlogView);
     },
 
-    render: function () {
+    renderBase: function () {
       $(this.el).append(this.template());
+    },
+
+    renderBlogView: function () {
+      $(this.el).empty();
+      this.renderBase();
+      var blogView = new BlogView({
+	el: this.el,
+	collection: this.collection
+      });
+    },
+
+    renderWriteView: function () {
+      $(this.el).empty();
+      this.renderBase();
       var writeView = new WriteView({
 	el: this.el,
 	collection: this.collection

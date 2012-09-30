@@ -35,23 +35,37 @@ app.get('/', function (req, res) {
 });
 
 app.get('/api/posts', function (req, res) {
-  var posts = Post.find();
-  res.send(posts);
+  return Post.find(function (err, posts) {
+    if (!err) {
+      return res.send(posts);
+    } else {
+      return console.log(err);
+    }
+  });
+});
+
+app.get('/api/posts/:id', function (req, res) {
+  return Post.findById(req.params.id);
 });
 
 app.post('/api/posts', function (req, res) {
+  console.log('post called');
   var post = new Post({
     title: req.body.title,
     content: req.body.content
   });
   post.save();
+  return res.send(post);
 });
 
 app.put('/api/posts/:id', function (req, res) {
-  console.log(id);
-  Post.update({'id': id}, {
+  console.log('put called');
+  Post.findByIdAndUpdate(req.params.id, {
     'title': req.body.title,
     'content': req.body.content
+  }, function() { 
+    console.log('update successful');
+    return res.send();
   });
 });
 

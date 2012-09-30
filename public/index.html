@@ -24,8 +24,8 @@
 	<div class="navbar-inner">
 	  <a class="brand" href="#">WordAnimate</a>
 	  <ul class="nav">
-	    <li class="active"><a href="#">Home</a></li>
-	    <li><a href="#">Link</a></li>
+	    <li><a id="view" href="#">View</a></li>
+	    <li><a id="compose" href="#">Compose</a></li>
 	    <li><a href="#">Link</a></li>
 	  </ul>
 	</div>
@@ -37,6 +37,15 @@
       <div id="editor"></div>
       <button id="save" class="btn btn-success"> Save </button>
       <button id="publish" class="btn btn-primary"> Publish </button>
+    </script>
+
+    <script type="text/template" id="blogtemplate">
+      <div></div>
+    </script>
+
+    <script type="text/template" id="posttemplate">
+      <h3><%= title %></h3>
+      <p><%= content %></p>
     </script>
 
   </body>
