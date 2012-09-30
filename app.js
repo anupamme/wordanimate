@@ -35,10 +35,24 @@ app.get('/', function (req, res) {
 });
 
 app.get('/api/posts', function (req, res) {
-  
+  var posts = Post.find();
+  res.send(posts);
 });
 
 app.post('/api/posts', function (req, res) {
+  var post = new Post({
+    title: req.body.title,
+    content: req.body.content
+  });
+  post.save();
+});
+
+app.put('/api/posts/:id', function (req, res) {
+  console.log(id);
+  Post.update({'id': id}, {
+    'title': req.body.title,
+    'content': req.body.content
+  });
 });
 
 http.createServer(app).listen(app.get('port'), function(){
